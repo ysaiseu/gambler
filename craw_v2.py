@@ -7,7 +7,7 @@ import urllib2
 from tabulate import tabulate
 from qqbot import qqbotsched
 
-@qqbotsched(hour='2-13/1', minute='3-59/10')
+@qqbotsched(hour='2-14/1', minute='3-59/10')
 def mytask(bot):
     gl = bot.List('group', '测试群')
     man = bot.List('buddy', '开奔驰捡垃圾')
@@ -23,7 +23,7 @@ def mytask(bot):
             bot.SendTo(m, msg[-1][1])
 
 def craw():
-    url = "http://caipiao.163.com/award/cqssc/20170915.html"
+    url = "http://caipiao.163.com/award/cqssc/20170914.html"
     response = urllib2.urlopen(url)
     print response.code
     html = response.read()
