@@ -13,17 +13,19 @@ import re
 import urllib2
 from tabulate import tabulate
 from qqbot import qqbotsched
+from datetime import datetime, timedelta
 
 lottery={}
 mode_dict = {}
 SN = 0
 s = []
 
-@qqbotsched(hour='0-24/1', minute='0-59/1')
+@qqbotsched(hour='0-23/1', minute='0-59/1')
 def mytask(bot):
     global SN
     global s
     s = []
+   
     gl = bot.List('group', '测试群')
     man = bot.List('buddy', '开奔驰捡垃圾')
     info = init()
@@ -222,9 +224,13 @@ def choose_c(a,b,c,d,e):
 ##  main  ##==================================================================================================================
 
 def init():
+    now = datetime.now() + timedelta(hours=8)
+    date = now.strftime("%Y%m%d")
+    time = now.strftime("%H:%M:%S")
+    print time
+
     #抓取数据，存入文件
     ROOT = '/home/ubuntu/.qqbot-tmp/plugins/'
-    date = '20170928'
     result = ['', '']       #result[0] 储存的是最近的期号，result[1]储存的是要发送的内容
     
     result = craw(date)
@@ -247,8 +253,6 @@ def init():
         line = lottery_text.readline()
 
     #print lottery
-    today=time.strftime("%Y%m%d", time.localtime())
-    #print str(int(today+'001')+1)
     key_list = lottery.keys()
     #print key_list
     key_list.sort()
@@ -335,18 +339,18 @@ def init():
         win_first_one.append(i,win(back,one))  ##前三单号万位
         win_first_two.append(i,win(back,two))  ##前三单号千位
         win_first_thr.append(i,win(back,three))  ##前三单号百位
-        a = five
-        b = choose_b(a,three,four,two,one)
+        a = one
+        b = choose_b(a,two,three,four,five)
         win_first_double1.append(i,win(back,a,b))  ##前三双号万位千位
-        a = five
-        b = choose_b(a,four,three,two,one)
+        a = one
+        b = choose_b(a,three,two,four,five)
         win_first_double2.append(i,win(back,a,b))  ##前三双号个位十位
-        a = four
-        b = choose_b(a,three,five,two,one)
+        a = two
+        b = choose_b(a,three,one,four,five)
         win_first_double3.append(i,win(back,a,b))  ##前三双号十位百位 
-        a = five
-        b = choose_b(a,four,three,two,one)
-        c = choose_c(a,b,three,two,one)
+        a = one
+        b = choose_b(a,two,three,four,five)
+        c = choose_c(a,b,three,four,five)
         win_first_triple.append(i,win(back,a,b,c))  ##前三杀三个号
         ##更新号码
         one = lottery_num[0]
@@ -364,7 +368,6 @@ def init():
     lottery_num = line_s[0]
     lottery[issue] = lottery_num
     i = issue
-    '''
 
     i = key_list[-1]        #最新的期号
 
@@ -409,18 +412,18 @@ def init():
     win_first_one.append(i,win(back,one))  ##前三单号万位
     win_first_two.append(i,win(back,two))  ##前三单号千位
     win_first_thr.append(i,win(back,three))  ##前三单号百位
-    a = five
-    b = choose_b(a,three,four,two,one)
+    a = one
+    b = choose_b(a,two,three,four,five)
     win_first_double1.append(i,win(back,a,b))  ##前三双号万位千位
-    a = five
-    b = choose_b(a,four,three,two,one)
+    a = one
+    b = choose_b(a,three,two,four,five)
     win_first_double2.append(i,win(back,a,b))  ##前三双号个位十位
-    a = four
-    b = choose_b(a,three,five,two,one)
+    a = two
+    b = choose_b(a,three,one,four,five)
     win_first_double3.append(i,win(back,a,b))  ##前三双号十位百位 
-    a = five
-    b = choose_b(a,four,three,two,one)
-    c = choose_c(a,b,three,two,one)
+    a = one
+    b = choose_b(a,two,three,four,five)
+    c = choose_c(a,b,three,four,five)
     win_first_triple.append(i,win(back,a,b,c))  ##前三杀三个号
     ##更新号码
     one = lottery_num[0]
@@ -428,7 +431,8 @@ def init():
     three = lottery_num[2]
     four = lottery_num[3]
     five = lottery_num[4]
-  
+    '''
+
     ##监控部分
     monitor_list = []
     monitor_list.append(win_back_one.monitor(6))
@@ -463,4 +467,4 @@ def init():
     return result
     
 
-#init()
+init()
