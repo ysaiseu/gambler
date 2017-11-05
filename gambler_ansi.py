@@ -126,7 +126,7 @@ class win_list:
     self.mode = mode
   def append(self,issue,if_win):
     self.win[issue]=if_win
-  def monitor(self,threshold):                   ##监控函数封装于字典类中，所有预警打印直接在此函数中进行，需针对该函数打印部分转化为机器人
+  def monitor(self,threshold,pro,times):                   ##监控函数封装于字典类中，所有预警打印直接在此函数中进行，需针对该函数打印部分转化为机器人
     global lottery
     global mode_dict
     global s
@@ -134,22 +134,35 @@ class win_list:
     key_list_re = sorted(key_list,reverse=True)  ##倒序期数键值
     key_list.sort()
     fail = 0
+    yes = 0.0
+    if len(key_list)>times:
+      lenth = len(key_list)-times
+      t = times
+    else:
+      lenth = 0
+      t = len(key_list)
+    for i in key_list[lenth:]:
+      if self.win[i] == 1:
+        yes = yes+1
+    yes = yes/t
     for i in key_list_re:
       if self.win[i] == 0:
         fail = fail + 1
-      elif fail >= threshold:   ##大于阈值 产生预警  以下为主要需要处理的部分
+      elif fail >= threshold or yes < pro:   ##大于阈值 产生预警  以下为主要需要处理的部分
         print "---------------------------------------------"
         print mode_dict[self.mode],"已达到预警条件:"
         print "当前次数:",fail
+        print "当前",times,"次成功率：",yes
         print "近期走势:"
         s.append( "---------------------------------------------")
         s.append(mode_dict[self.mode]+" 已达到预警条件:")
         s.append("当前次数: "+str(fail))
-        s.append("近期走势:")
+        s.append("当前"+str(times)+"次成功率"+str(yes)[0:4])
+        s.append("近期走势")
         count = 0
         s.append('')
         if len(key_list)>=100:
-          lenth = len(key_list)-100
+          lenth = len(key_list)-99
         else:
           lenth = 0
         for j in key_list[lenth:]:
@@ -160,6 +173,17 @@ class win_list:
             s[-1] = s[-1] + str(count) +' '
             count = 0
         print "\n--------------------------------------------"
+        s.append('')
+        if len(key_list) < times:
+            s[-1] = s[-1] + str(yes)[0:4] +' '
+        else:
+          for index in range(len(key_list)-times+1):
+            yes = 0.0
+            for j in range(times):
+                if self.win[key_list[index+j]]==1:
+                    yes = yes+1
+            s[-1] = s[-1] + str(yes/times)[0:4] + ' '
+
         s.append("\n--------------------------------------------")
         return fail
       else:
@@ -359,105 +383,32 @@ def init():
         four = lottery_num[3]
         five = lottery_num[4]
         print one,two,three,four,five
-
-    '''
-    ##获取最新数据部分
-    #line = raw_input("请输入下期开奖号码：")  ##机器人程序中由爬虫提供接口，格式按照约定”开奖号码 期数“，且需与文本中存储格式一致
-    line_s = line.split()
-    issue = line_s[1]
-    lottery_num = line_s[0]
-    lottery[issue] = lottery_num
-    i = issue
-
-    i = key_list[-1]        #最新的期号
-
-    ##后三组六模式
-    back = lottery_num[2:5]
-    win_back_one.append(i,win(back,five))  ##后三单号个位
-    win_back_two.append(i,win(back,four))  ##后三单号十位
-    win_back_thr.append(i,win(back,three))  ##后三单号百位
-    a = five
-    b = choose_b(a,three,four,two,one)
-    win_back_double1.append(i,win(back,a,b))  ##后三双号个位百位
-    a = five
-    b = choose_b(a,four,three,two,one)
-    win_back_double2.append(i,win(back,a,b))  ##后三双号个位十位
-    a = four
-    b = choose_b(a,three,five,two,one)
-    win_back_double3.append(i,win(back,a,b))  ##后三双号十位百位 
-    a = five
-    b = choose_b(a,four,three,two,one)
-    c = choose_c(a,b,three,two,one)
-    win_back_triple.append(i,win(back,a,b,c))  ##后三杀三个号
-    ##中三组六模式
-    back = lottery_num[1:4]
-    win_mid_one.append(i,win(back,two))  ##中三单号千位
-    win_mid_two.append(i,win(back,three))  ##中三单号百位
-    win_mid_thr.append(i,win(back,four))  ##中三单号十位
-    a = two
-    b = choose_b(a,three,four,one,five)
-    win_mid_double1.append(i,win(back,a,b))  ##中三双号千位百位
-    a = two
-    b = choose_b(a,four,three,one,five)
-    win_mid_double2.append(i,win(back,a,b))  ##中三双号千位十位
-    a = three
-    b = choose_b(a,four,two,one,five)
-    win_mid_double3.append(i,win(back,a,b))  ##中三双号百位十位
-    a = two
-    b = choose_b(a,three,four,one,five)
-    c = choose_c(a,b,four,one,five)
-    win_mid_triple.append(i,win(back,a,b,c))  ##中三杀三个号
-    ##前三组六模式
-    back = lottery_num[0:3]
-    win_first_one.append(i,win(back,one))  ##前三单号万位
-    win_first_two.append(i,win(back,two))  ##前三单号千位
-    win_first_thr.append(i,win(back,three))  ##前三单号百位
-    a = one
-    b = choose_b(a,two,three,four,five)
-    win_first_double1.append(i,win(back,a,b))  ##前三双号万位千位
-    a = one
-    b = choose_b(a,three,two,four,five)
-    win_first_double2.append(i,win(back,a,b))  ##前三双号个位十位
-    a = two
-    b = choose_b(a,three,one,four,five)
-    win_first_double3.append(i,win(back,a,b))  ##前三双号十位百位 
-    a = one
-    b = choose_b(a,two,three,four,five)
-    c = choose_c(a,b,three,four,five)
-    win_first_triple.append(i,win(back,a,b,c))  ##前三杀三个号
-    ##更新号码
-    one = lottery_num[0]
-    two = lottery_num[1]
-    three = lottery_num[2]
-    four = lottery_num[3]
-    five = lottery_num[4]
-    '''
-
+   
     ##监控部分
     monitor_list = []
-    monitor_list.append(win_back_one.monitor(6))
-    monitor_list.append(win_back_two.monitor(6))
-    monitor_list.append(win_back_thr.monitor(6))
-    monitor_list.append(win_back_double1.monitor(10))
-    monitor_list.append(win_back_double2.monitor(10))
-    monitor_list.append(win_back_double3.monitor(10))
-    monitor_list.append(win_back_triple.monitor(18))
+    monitor_list.append(win_back_one.monitor(6,0.3,12))
+    monitor_list.append(win_back_two.monitor(6,0.3,12))
+    monitor_list.append(win_back_thr.monitor(6,0.3,12))
+    monitor_list.append(win_back_double1.monitor(10,0.2,20))
+    monitor_list.append(win_back_double2.monitor(10,0.2,20))
+    monitor_list.append(win_back_double3.monitor(10,0.2,20))
+    monitor_list.append(win_back_triple.monitor(20,0.1,30))
 
-    monitor_list.append(win_mid_one.monitor(6))
-    monitor_list.append(win_mid_two.monitor(6))
-    monitor_list.append(win_mid_thr.monitor(6))
-    monitor_list.append(win_mid_double1.monitor(10))
-    monitor_list.append(win_mid_double2.monitor(10))
-    monitor_list.append(win_mid_double3.monitor(10))
-    monitor_list.append(win_mid_triple.monitor(18))
+    monitor_list.append(win_mid_one.monitor(6,0.3,12))
+    monitor_list.append(win_mid_two.monitor(6,0.3,12))
+    monitor_list.append(win_mid_thr.monitor(6,0.3,12))
+    monitor_list.append(win_mid_double1.monitor(10,0.2,20))
+    monitor_list.append(win_mid_double2.monitor(10,0.2,20))
+    monitor_list.append(win_mid_double3.monitor(10,0.2,20))
+    monitor_list.append(win_mid_triple.monitor(20,0.1,30))
 
-    monitor_list.append(win_first_one.monitor(6))
-    monitor_list.append(win_first_two.monitor(6))
-    monitor_list.append(win_first_thr.monitor(6))
-    monitor_list.append(win_first_double1.monitor(10))
-    monitor_list.append(win_first_double2.monitor(10))
-    monitor_list.append(win_first_double3.monitor(10))
-    monitor_list.append(win_first_triple.monitor(18))
+    monitor_list.append(win_first_one.monitor(6,0.3,12))
+    monitor_list.append(win_first_two.monitor(6,0.3,12))
+    monitor_list.append(win_first_thr.monitor(6,0.3,12))
+    monitor_list.append(win_first_double1.monitor(10,0.2,20))
+    monitor_list.append(win_first_double2.monitor(10,0.2,20))
+    monitor_list.append(win_first_double3.monitor(10,0.2,20))
+    monitor_list.append(win_first_triple.monitor(20,0.1,30))
   
     if if_yujing(monitor_list):
         print "预警成功"
