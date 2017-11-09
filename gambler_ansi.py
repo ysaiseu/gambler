@@ -11,6 +11,7 @@ import urllib2
 from tabulate import tabulate
 from qqbot import qqbotsched
 from datetime import datetime, timedelta
+import threading
 
 lottery={}
 mode_dict = {}
@@ -18,7 +19,7 @@ SN = 0
 s = []
 yujing_flag = 0
 
-@qqbotsched(hour='0-23/1', minute='0-59/1')
+@qqbotsched(hour='0-23/1', minute='0-59/1', second='0-59/10')
 def mytask(bot):
     global SN
     global s
@@ -28,7 +29,7 @@ def mytask(bot):
     man = bot.List('buddy', '开奔驰捡垃圾')
     time0 = time.time()
     info = init()
-    print "time = ", time.time() - time
+    print "time = ", time.time() - time0
     SN_new = info[0]
     msg = info[1]
     s_all = '上一期期号 ： ' + str(SN) + '\n'
@@ -54,56 +55,6 @@ def mytask(bot):
             bot.SendTo(m, msg[-1][0])
             bot.SendTo(m, msg[-1][1])
     '''
-
-def craw(date):
-    url = "http://caipiao.163.com/award/cqssc/"+date+".html"
-    response = urllib2.urlopen(url)
-    print response.code
-    html = response.read()
-
-    info = '''<td class="start" data-win-number='(.*)' data-period="(.*)">''' 
-    result = re.findall(info, html)
-
-    i = 0
-    j = 0
-    table = [[]]
-
-    while 1:
-        for i in range(3):
-            if len(result) <= j*3+i:
-                print j*3+1
-                break
-            table[j].append(result[j*3+i])
-        if len(result) <= j*3+i:
-            break
-        table.append([])
-        i = 0
-        j = j+1
-
-
-    #print tabulate(table)
-    #s = tabulate(table)
-
-    i = 0
-    s = []
-
-    for i in range(0, len(result)):
-        for j in range(len(result)-1, i, -1):
-            if result[j][1] < result[j-1][1]:
-                tmp = result[j]
-                result[j] = result[j-1]
-                result[j-1] = tmp
-    
-    #print result
-
-    for i in range(len(result)):
-        s.append([])
-        s[i].append(str(result[i][0]).replace(' ',''))
-        s[i].append(result[i][1])
-        #print str(result[i][0]).replace(' ','')
-        
-    return s
-
 
 def tongji(list,n):
   print "重复序列:"
@@ -323,31 +274,15 @@ def choose_c(a,b,c,d,e):
 ##  main  ##==================================================================================================================
 
 def init():
+    print "New Message coming!"     #flag to see if the robot is down
+    global lottery
+    global mode_dict
+    result = ['', '']
+    #抓取数据，存入文件
+    ROOT = '/home/ubuntu/.qqbot-tmp/plugins/'
     now = datetime.now() + timedelta(hours=8)
     yesterday = now - timedelta(days=1)
     date = now.strftime("%Y%m%d")
-    yesterdate = yesterday.strftime("%Y%m%d")
-    time = now.strftime("%H:%M:%S")
-    print time
-
-    #抓取数据，存入文件
-    ROOT = '/home/ubuntu/.qqbot-tmp/plugins/'
-    result = ['', '']       #result[0] 储存的是最近的期号，result[1]储存的是要发送的内容
-    
-    result = craw(date)
-    result1 = craw(yesterdate)
-    print "New Message coming!"     #flag to see if the robot is down
-    f = open(ROOT+date+'.txt', 'w')
-    for r in result:
-        f.write(r[0]+' ')
-        f.write(r[1]+'\n')
-    for r in result1:
-        f.write(r[0]+' ')
-        f.write(r[1]+'\n')
-    f.close()
-
-    global lottery
-    global mode_dict
     lottery_text = open(ROOT+date+'.txt',"r+")
     line = lottery_text.readline()
     print line

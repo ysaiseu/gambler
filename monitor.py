@@ -5,9 +5,14 @@ import os
 import time
 import subprocess 
 import logging
+import threading
+import urllib2
+import re
+import string
+from datetime import datetime, timedelta
 
 def count_f():
-    f = open("daemon-505455347.log")
+    f = open("../daemon-505455347.log")
     lines = f.readlines()
     count = 0
     count_qc = 0
@@ -39,7 +44,7 @@ def reboot():
 def craw(date):
     url = "http://caipiao.163.com/award/cqssc/"+date+".html"
     response = urllib2.urlopen(url)
-    print response.code
+    #print response.code
     html = response.read()
 
     info = '''<td class="start" data-win-number='(.*)' data-period="(.*)">''' 
@@ -52,7 +57,7 @@ def craw(date):
     while 1:
         for i in range(3):
             if len(result) <= j*3+i:
-                print j*3+1
+                #print j*3+1
                 break
             table[j].append(result[j*3+i])
         if len(result) <= j*3+i:
@@ -79,10 +84,24 @@ def craw(date):
         
     return s
 
-if __name__ == __"main":_
+class CrawThread(threading.Thread):
+    def __init__(self,date):
+        threading.Thread.__init__(self, name = "CrawThread") 
+        self.date = date
+        self.result = []
+    def run(self):
+        self.result = craw(self.date)
+    def get_result(self):
+        return self.result
+
+if __name__ == "__main__":
     time_beat = 0
     count_pre = count_f()[0]
     time_count = 10
+    result = []
+    result1 = []
+    yesterday_init = 0
+
     logging.basicConfig(level=logging.INFO,
                         format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
                         datefmt='%a, %d %b %Y %H:%M:%S',
@@ -90,7 +109,48 @@ if __name__ == __"main":_
                         filemode='w+')
 
     while 1:
+        now = datetime.now() + timedelta(hours=8)
+        yesterday = now - timedelta(days=1)
+        date = now.strftime("%Y%m%d")
+        yesterdate = yesterday.strftime("%Y%m%d")
+        time0 = now.strftime("%H:%M:%S")
+        logging.info(str(time0))
+
+        #抓取数据，存入文件
+        ROOT = '/home/ubuntu/.qqbot-tmp/plugins/'
+    
+        t1 = CrawThread(date)  
+        t1.start()  
+        t1.join(15)
+        if t1.isAlive():
+            logging.info('get info timeout')
+        else:
+            logging.info('get info success')
+            result = t1.get_result()
+
+        if yesterday_init == 0: 
+            time.sleep(15)
+            t1 = CrawThread(yesterdate)  
+            t1.start()  
+            t1.join(15)
+            if t1.isAlive():
+                logging.info('get yesterday info timeout')
+            else:
+                result1 = t1.get_result()
+                logging.info('get yesterday info success')
+                yesterday_init = 1
+
+        f = open(ROOT+date+'.txt', 'w')
+        for r in result:
+            f.write(r[0]+' ')
+            f.write(r[1]+'\n')
+        for r in result1:
+            f.write(r[0]+' ')
+            f.write(r[1]+'\n')
+        f.close()
+
         time.sleep(20)
+
         get_count = count_f()
         count = get_count[0]
         count_qc = get_count[1]
