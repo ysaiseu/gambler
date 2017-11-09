@@ -16,6 +16,7 @@ lottery={}
 mode_dict = {}
 SN = 0
 s = []
+yujing_flag = 0
 
 @qqbotsched(hour='0-23/1', minute='0-59/1')
 def mytask(bot):
@@ -25,15 +26,22 @@ def mytask(bot):
    
     gl = bot.List('group', '测试群')
     man = bot.List('buddy', '开奔驰捡垃圾')
+    time0 = time.time()
     info = init()
+    print "time = ", time.time() - time
     SN_new = info[0]
     msg = info[1]
     s_all = '上一期期号 ： ' + str(SN) + '\n'
     s_all = s_all + '当前期号 ： ' + str(SN_new) + '\n'
     s_all = s_all + '当前号码 ： ' + msg + '\n'
+    global yujing_flag
     if SN != SN_new:
         SN = SN_new
         #print s
+        if yujing_flag == 0:
+            return
+        else:
+            yujing_flag = 0
         if gl is not None:
             for group in gl:
                 for s_line in s:
@@ -328,6 +336,7 @@ def init():
     
     result = craw(date)
     result1 = craw(yesterdate)
+    print "New Message coming!"     #flag to see if the robot is down
     f = open(ROOT+date+'.txt', 'w')
     for r in result:
         f.write(r[0]+' ')
@@ -564,16 +573,21 @@ def init():
     monitor_list.append(win_first_cold1.monitor(5,0.0,12))
     monitor_list.append(win_back_cold2.monitor(8,0.0,20))
     monitor_list.append(win_mid_cold2.monitor(8,0.0,20))
-    monitor_list.append(win_first_cold2.monitor(8,0.2,20))
+    monitor_list.append(win_first_cold2.monitor(8,0.0,20))
     monitor_list.append(win_back_cold3.monitor(15,0.0,20))
     monitor_list.append(win_mid_cold3.monitor(15,0.0,20))
     monitor_list.append(win_first_cold3.monitor(15,0.0,20))	
+    global yujing_flag
     if if_yujing(monitor_list):
+        yujing_flag = 1
         print "预警成功"
     else:
+        yujing_flag = 0
         print "当前无预警"
 
     return result
     
 
+time0 = time.time()
 init()
+print "time = ", time.time()-time0
