@@ -61,6 +61,6 @@ def mytask(bot):
 ##  main  ##==================================================================================================================
 
 def init():
-    gambler_data.data_handle()
+    return gambler_data.data_handle()
 
 init()
