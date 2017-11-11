@@ -102,7 +102,6 @@ class win_list:
     global lottery
     global mode_dict
     global s
-    s = []
     key_list = lottery.keys()
     key_list_re = sorted(key_list,reverse=True)  ##倒序期数键值
     key_list.sort()
@@ -127,6 +126,7 @@ class win_list:
         print "当前次数:",fail
         print "当前",times,"次成功率：",yes
         print "近期走势:"
+        s = []
         s.append( "---------------------------------------------")
         s.append(mode_dict[self.mode]+" 已达到预警条件:")
         s.append("当前次数: "+str(fail))
