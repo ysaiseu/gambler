@@ -102,6 +102,7 @@ class win_list:
     global lottery
     global mode_dict
     global s
+    s = []
     key_list = lottery.keys()
     key_list_re = sorted(key_list,reverse=True)  ##倒序期数键值
     key_list.sort()

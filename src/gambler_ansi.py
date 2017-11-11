@@ -22,7 +22,6 @@ SN = 0
 @qqbotsched(hour='0-23/1', minute='0-59/1', second='0-59/10')
 def mytask(bot):
     global SN
-    gambler_data.s = []
    
     gl = bot.List('group', '测试群')
     man = bot.List('buddy', '开奔驰捡垃圾')
