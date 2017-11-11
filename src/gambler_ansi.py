@@ -18,12 +18,11 @@ import gambler_data
 lottery={}
 mode_dict = {}
 SN = 0
-s = []
 
 @qqbotsched(hour='0-23/1', minute='0-59/1', second='0-59/10')
 def mytask(bot):
     global SN
-    s = []
+    gambler_data.s = []
    
     gl = bot.List('group', '测试群')
     man = bot.List('buddy', '开奔驰捡垃圾')
@@ -57,8 +56,6 @@ def mytask(bot):
             bot.SendTo(m, msg[-1][0])
             bot.SendTo(m, msg[-1][1])
     '''
-##  main  ##==================================================================================================================
-##  main  ##==================================================================================================================
 
 def init():
     result = gambler_data.data_handle()
