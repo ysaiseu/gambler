@@ -19,12 +19,10 @@ lottery={}
 mode_dict = {}
 SN = 0
 s = []
-yujing_flag = 0
 
-@qqbotsched(hour='0-23/1', minute='0-59/1', second='0-59/5')
+@qqbotsched(hour='0-23/1', minute='0-59/1', second='0-59/10')
 def mytask(bot):
     global SN
-    global s
     s = []
    
     gl = bot.List('group', '测试群')
@@ -37,7 +35,8 @@ def mytask(bot):
     s_all = '上一期期号 ： ' + str(SN) + '\n'
     s_all = s_all + '当前期号 ： ' + str(SN_new) + '\n'
     s_all = s_all + '当前号码 ： ' + msg + '\n'
-    global yujing_flag
+    yujing_flag = gambler_data.yujing_flag
+    print SN, SN_new
     if SN != SN_new:
         SN = SN_new
         #print s
@@ -47,6 +46,7 @@ def mytask(bot):
             yujing_flag = 0
         if gl is not None:
             for group in gl:
+                s = gambler_data.s
                 for s_line in s:
                     s_all = s_all + s_line + '\n'
                 bot.SendTo(group, s_all)
@@ -61,6 +61,7 @@ def mytask(bot):
 ##  main  ##==================================================================================================================
 
 def init():
-    return gambler_data.data_handle()
-
-init()
+    result = gambler_data.data_handle()
+    return result
+    
+#init()

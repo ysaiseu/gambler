@@ -56,9 +56,9 @@ def cold(ran,issue):
         t = cold_list[i]
         cold_list[i] = cold_list[i+j+1]
         cold_list[i+j+1] = t
-  print count
-  print cold_list
-  print lottery[issue]
+  #print count
+  #print cold_list
+  #print lottery[issue]
   return cold_list
 
 def count_5x(list):
@@ -375,7 +375,7 @@ def data_handle():
         four = lottery_num[3]
         five = lottery_num[4]
         #print one,two,three,four,five
-   
+    win_first_double1.monitor(2,0.0,20)
     ##监控部分
     monitor_list = []
 
@@ -394,4 +394,6 @@ def data_handle():
 
     return result
 
-    
+if __name__ == '__main__':
+    print data_handle()
+

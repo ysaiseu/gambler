@@ -28,8 +28,8 @@
 		"win_5x_60"  : {"monitor":"8,0,12", "init": 60},
 		"win_5x_30"  : {"monitor":"40,0,20", "init": 30},
 		"win_5x_20"  : {"monitor":"50,0,20", "init": 20},
-		"win_5x_10"  : {"monitor":"-1,0,0", "init": 10},
-		"win_5x_500" : {"monitor":"-1,0,0", "init": 500},
+		"win_5x_10"  : {"monitor":"-1,0,50", "init": 10},
+		"win_5x_500" : {"monitor":"-1,0,50", "init": 500},
 
 		"win_back_zusan" : {"monitor":"12,0,20", "init": 0},
 		"win_mid_zusan"  : {"monitor":"12,0,20", "init": 8},

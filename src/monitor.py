@@ -148,6 +148,7 @@ if __name__ == "__main__":
 
         f = open(ROOT_DATA+date+'.txt', 'w')
         if result is None or result1 is None:
+            f.close()
             continue
         for r in result:
             f.write(r[0]+' ')
