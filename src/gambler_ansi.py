@@ -47,8 +47,8 @@ def mytask(bot):
                 s = gambler_data.s
                 for s_line in s:
                     s_all = s_all + s_line + '\n'
-		    gambler_data.s = []
-		    bot.SendTo(group, s_all)
+		gambler_data.s = []
+		bot.SendTo(group, s_all)
                 s_all = ''
     '''
     if man is not None:
