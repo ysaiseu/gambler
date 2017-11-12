@@ -36,24 +36,24 @@
 		"win_first_zusan": {"monitor":"12,0,20", "init": 9},
 
 		"win_back_cold1" : {"monitor":"5,0,12", "init": 31},
-		"win_mid_cold1"  : {"monitor":"5,0,12", "init": 32},
-		"win_first_cold1": {"monitor":"5,0,12", "init": 33},
+		"win_mid_cold1"  : {"monitor":"5,0,12", "init": 41},
+		"win_first_cold1": {"monitor":"5,0,12", "init": 51},
 		"win_back_hot1" : {"monitor":"-1,0,20", "init": 34},
-		"win_mid_hot1"  : {"monitor":"-1,0,20", "init": 35},
-		"win_first_hot1": {"monitor":"-1,0,20", "init": 36},
+		"win_mid_hot1"  : {"monitor":"-1,0,20", "init": 44},
+		"win_first_hot1": {"monitor":"-1,0,20", "init": 54},
 
-		"win_back_cold2" : {"monitor":"8,0,20", "init": 41},
+		"win_back_cold2" : {"monitor":"8,0,20", "init": 32},
 		"win_mid_cold2"  : {"monitor":"8,0,20", "init": 42},
-		"win_first_cold2": {"monitor":"8,0,20", "init": 43},
-		"win_back_hot2" : {"monitor":"-1,0,12", "init": 44},
+		"win_first_cold2": {"monitor":"8,0,20", "init": 52},
+		"win_back_hot2" : {"monitor":"-1,0,12", "init": 35},
 		"win_mid_hot2"  : {"monitor":"-1,0,12", "init": 45},
-		"win_first_hot2": {"monitor":"-1,0,12", "init": 46},
+		"win_first_hot2": {"monitor":"-1,0,12", "init": 55},
 
-		"win_back_cold3" : {"monitor":"15,0,20", "init": 51},
-		"win_mid_cold3"  : {"monitor":"15,0,20", "init": 52},
+		"win_back_cold3" : {"monitor":"15,0,20", "init": 33},
+		"win_mid_cold3"  : {"monitor":"15,0,20", "init": 43},
 		"win_first_cold3": {"monitor":"15,0,20", "init": 53},
-		"win_back_hot3" : {"monitor":"-1,0,12", "init": 54},
-		"win_mid_hot3"  : {"monitor":"-1,0,12", "init": 55},
+		"win_back_hot3" : {"monitor":"-1,0,12", "init": 36},
+		"win_mid_hot3"  : {"monitor":"-1,0,12", "init": 46},
 		"win_first_hot3": {"monitor":"-1,0,12", "init": 56}
 	}
 ]
