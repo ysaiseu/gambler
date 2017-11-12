@@ -12,11 +12,11 @@ def onQQMessage(bot, contact, member, content):
     elif content == '关闭':
         bot.SendTo(contact, '已关闭')
         bot.Stop()
-    elif re.match('查询.*(，.*)*','content'):
+    elif re.match('查询.*(，.*)*',content):
         gambler_data.command = content.replace('查询','',1).split('，')
-        gambler_data.handle(1)
-        gambler_data.command = [command(0),command(1)]
+        gambler_data.data_handle(1)
+        gambler_data.command = []
         text = ''
-        for i in s:
+        for i in gambler_data.s:
           text = text + i +'\n'
-        bot.sendto(contact,text)
+        bot.SendTo(contact,text)

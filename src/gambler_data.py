@@ -5,6 +5,7 @@ import time
 from datetime import datetime, timedelta
 import json
 
+cold_dict = {}
 lottery={}
 mode_dict = {}
 s = []
@@ -265,14 +266,16 @@ def choose_c(a,b,c,d,e):
 
 def query(*command):
     global lottery
+    global cold_dict
+    global s
     key_list = lottery.keys()
     key_list.sort()
     if command[0] == '冷号':
         cold_list = cold(command[1],key_list[-1])
-        s.append(cammand[1]+'期冷号：')
+        s.append(command[1]+'期冷号：')
         s.append('')
         for i in sorted(cold_dict.items(), key=lambda d:d[1],reverse=False):
-            s[-1] = s[-1] + i[0] + ':' + i[1] + '次，'
+            s[-1] = s[-1] + str(i[0]) + ':' + str(i[1]) + '次，'
     else:
         try:
             name = globals()[name_dict[int(command[0])]]
@@ -285,6 +288,7 @@ def query(*command):
             s.append("期数不能为零")  
         else:
             s.append("无对应模式")
+
 def data_handle(run):
     print "New Message coming!"     #flag to see if the robot is down
     global lottery
@@ -336,7 +340,7 @@ def data_handle(run):
     #init for such like win_back_two = win_list(2)
     for key,value in dict_item.items():
         globals()[key] = win_list((int)(value['init']))
-    cold_dict = {}
+    global cold_dict
     cold_list = [0,1,2,3,4,5,6,7,8,9]
 
     one = two = three = four = five = -1
