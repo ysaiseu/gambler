@@ -9,7 +9,17 @@ lottery={}
 mode_dict = {}
 s = []
 yujing_flag = 0
-
+command = [0,20]
+name_dict = {1:'win_back_one',2:'win_back_two',3:'win_back_thr',4:'win_back_double1',
+  5:'win_back_double2',6:'win_back_double3',7:'win_back_triple',11:'win_mid_one',
+  12:'win_mid_two',13:'win_mid_thr',14:'win_mid_double1',15:'win_mid_double2',
+  16:'win_mid_double3',17:'win_mid_triple',21:'win_first_one',22:'win_first_two',
+  23:'win_first_thr',24:'win_first_double1',25:'win_first_double2',26:'win_first_double3',27:'win_first_triple',
+  120:'win_5x_120',60:'win_5x_60',30:'win_5x_30',20:'win_5x_20',10:'win_5x_10',500:'win_5x_500',
+  0:'win_back_zusan',8:'win_mid_zusan',9:'win_first_zusan',
+  31:'win_back_cold1',32:'win_back_cold2',33:'win_back_cold3',34:'win_back_hot1',35:'win_back_hot2',36:'win_back_hot3',
+  41:'win_mid_cold1',42:'win_mid_cold2',43:'win_mid_cold3',44:'win_mid_hot1',45:'win_mid_hot2',46:'win_mid_hot3',
+  51:'win_first_cold1',52:'win_first_cold2',53:'win_first_cold3',54:'win_first_hot1',55:'win_first_hot2',56:'win_first_hot3'}
 def tongji(list,n):
   print "重复序列:"
   for i in list:
@@ -35,31 +45,19 @@ def cold(ran,issue):
   key_list.sort()
   key_list_re = sorted(key_list,reverse=True)
   index = key_list_re.index(issue)
-  count = []
+  count_dict = {0:0,1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0}
   cold_list = [0,1,2,3,4,5,6,7,8,9]
-  for i in range(10):
-    count.append(0)
+
   if ran<(len(key_list_re)-index):
     for i in range(int(ran)):
       for j in lottery[key_list_re[i+index]]:
-        count[int(j)] = count[int(j)] + 1
+        count_dict[int(j)] = count_dict[int(j)] + 1
   else:
     for i in range(len(key_list_re)-index):
       for j in lottery[key_list_re[i+index]]:
-        count[int(j)] = count[int(j)] + 1
-  for i in range(9):
-    for j in range(9-i):
-      if count[i] > count[i+j+1]:
-        t = count[i]
-        count[i] = count[i+j+1]
-        count[i+j+1] = t
-        t = cold_list[i]
-        cold_list[i] = cold_list[i+j+1]
-        cold_list[i+j+1] = t
-  #print count
-  #print cold_list
-  #print lottery[issue]
-  return cold_list
+        count_dict[int(j)] = count_dict[int(j)] + 1
+
+  return count_dict
 
 def count_5x(list):
   #global dict_5x
@@ -126,7 +124,7 @@ class win_list:
         print "当前次数:",fail
         print "当前",times,"次成功率：",yes
         print "近期走势:"
-        s = []
+        ##s = []
         s.append( "---------------------------------------------")
         s.append(mode_dict[self.mode]+" 已达到预警条件:")
         s.append("当前次数: "+str(fail))
@@ -164,18 +162,57 @@ class win_list:
       else:
         return 0
 
-  def display_fail(self,times):
+  def display(self,times):
     global lottery
-    count = 0
+    global mode_dict
+    global s
     key_list = lottery.keys()
+    key_list_re = sorted(key_list,reverse=True)  ##倒序期数键值
     key_list.sort()
     fail = 0
-    for i in key_list[len(key_list)-times:]:
-      if self.win[i] == 0:
+    yes = 0.0
+    if len(key_list)>times:
+      lenth = len(key_list)-times
+      t = times
+    else:
+      lenth = 0
+      t = len(key_list)
+    for i in key_list[lenth:]:
+      if self.win[i] == 1:
+        yes = yes+1
+    yes = yes/t
+    for j in key_list_re:
+      if self.win[j] == 0:
         fail = fail + 1
       else:
-        print fail,
-        fail = 0
+        break
+    s.append("--------------------------------------------")
+    s.append("当前次数: "+str(fail))
+    s.append("当前"+str(times)+"次成功率"+str(yes))
+    s.append("近期走势：")
+    count = 0
+    s.append('')
+    if len(key_list)>=100:
+      lenth = len(key_list)-99
+    else:
+      lenth = 0
+    for j in key_list[lenth:]:
+      if self.win[j] == 0:
+        count = count + 1
+      else:
+        s[-1] = s[-1] + str(count) +' '
+        count = 0
+    s.append('')
+    if len(key_list) < times:
+      s[-1] = s[-1] + "期数不足总数：" + str(yes)[0:4]
+    else:
+      for index in range(len(key_list)-times+1):
+        yes = 0.0
+        for j in range(times):
+            if self.win[key_list[index+j]]==1:
+                yes = yes+1
+        s[-1] = s[-1] + str(yes/times)[0:4] + ' '
+    s.append("--------------------------------------------")
 
 
 
@@ -226,18 +263,43 @@ def choose_c(a,b,c,d,e):
   else:
     return (int(b)+1)%10
 
-def data_handle():
+def query(*command):
+    global lottery
+    key_list = lottery.keys()
+    key_list.sort()
+    if command[0] == '冷号':
+        cold_list = cold(command[1],key_list[-1])
+        s.append(cammand[1]+'期冷号：')
+        s.append('')
+        for i in sorted(cold_dict.items(), key=lambda d:d[1],reverse=False):
+            s[-1] = s[-1] + i[0] + ':' + i[1] + '次，'
+    else:
+        try:
+            name = globals()[name_dict[int(command[0])]]
+            s.append("--------------------------------------------")
+            s.append(mode_dict[int(command[0])])
+            name.display(int(command[1]))
+        except ValueError:
+            s.append("命令类型有误")
+        except ZeroDivisionError:
+            s.append("期数不能为零")  
+        else:
+            s.append("无对应模式")
+def data_handle(run):
     print "New Message coming!"     #flag to see if the robot is down
     global lottery
     global mode_dict
+    global s
     result = ['', '']
     ROOT = '/home/ubuntu/.qqbot-tmp/plugins/'
+    ##ROOT = 'd:/users/xinhu/documents/github/gambler/'
     ROOT_DATA = ROOT + 'data/'
     ROOT_CONFIG = ROOT + 'config/'
     now = datetime.now() + timedelta(hours=8)
     yesterday = now - timedelta(days=1)
     date = now.strftime("%Y%m%d")
     lottery_text = open(ROOT_DATA+date+'.txt',"r+")
+    ##lottery_text = open('number.txt',"r+")
     line = lottery_text.readline()
     #print line
 
@@ -274,7 +336,7 @@ def data_handle():
     #init for such like win_back_two = win_list(2)
     for key,value in dict_item.items():
         globals()[key] = win_list((int)(value['init']))
-    
+    cold_dict = {}
     cold_list = [0,1,2,3,4,5,6,7,8,9]
 
     one = two = three = four = five = -1
@@ -369,32 +431,44 @@ def data_handle():
         win_first_hot2.append(i,win(first,a,b))
         win_first_hot3.append(i,win(first,a,b,c))
         ##更新号码
-        cold_list = cold(24,i)
+        cold_dict = cold(24,i)
+        
+        cold_list=[]
+        for i in sorted(cold_dict.items(), key=lambda d:d[1],reverse=False):
+          cold_list.append(i[0])
+
         one = lottery_num[0]
         two = lottery_num[1]
         three = lottery_num[2]
         four = lottery_num[3]
         five = lottery_num[4]
         #print one,two,three,four,five
-    win_first_double1.monitor(2,0.0,20)
+
     ##监控部分
-    monitor_list = []
-
-    for key,value in dict_item.items():
-            monitor_str = value['monitor'].split(',')
-            if monitor_str[0] != '-1':
-                monitor_list.append(globals()[key].monitor((float)(monitor_str[0]),(float)(monitor_str[1]),(int)(monitor_str[2])))
-
-    global yujing_flag
-    if if_yujing(monitor_list):
-        yujing_flag = 1
-        print "预警成功"
-    else:
-        yujing_flag = 0
-        print "当前无预警"
+    if run == 0:
+        s = []
+        monitor_list = []
+        for key,value in dict_item.items():
+                monitor_str = value['monitor'].split(',')
+                if monitor_str[0] != '-1':
+                    monitor_list.append(globals()[key].monitor((float)(monitor_str[0]),(float)(monitor_str[1]),(int)(monitor_str[2])))
+        
+        global yujing_flag
+        if if_yujing(monitor_list):
+            yujing_flag = 1
+            print "预警成功"
+        else:
+            yujing_flag = 0
+            print "当前无预警"
+    elif run == 1:
+        s = []
+        query(command[0],command[1])
+    for i in s:
+        print i
+        
 
     return result
 
 if __name__ == '__main__':
-    print data_handle()
+    print data_handle(0)
 
