@@ -265,7 +265,8 @@ def query(*command):
             s[-1] = s[-1] + str(i[0]) + ':' + str(i[1]) + '次，'
     else:
         try:
-            name = globals()[name_dict[int(command[0])]]
+            global_data.set_name_dict()
+            name = globals()[global_data.name_dict[int(command[0])]]
             s.append("--------------------------------------------")
             s.append(mode_dict[int(command[0])])
             name.display(int(command[1]))
