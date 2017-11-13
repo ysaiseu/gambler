@@ -18,7 +18,6 @@ import global_data
 
 @qqbotsched(hour='0-23/1', minute='0-59/1', second='0-59/10')
 def mytask(bot):
-    SN = global_data
    
     gl = bot.List('group', '测试群')
     man = bot.List('buddy', '开奔驰捡垃圾')
@@ -27,24 +26,21 @@ def mytask(bot):
     print "time = ", time.time() - time0
     SN_new = info[0]
     msg = info[1]
-    s_all = '上一期期号 ： ' + str(SN) + '\n'
+    s_all = '上一期期号 ： ' + str(global_data.SN) + '\n'
     s_all = s_all + '当前期号 ： ' + str(SN_new) + '\n'
     s_all = s_all + '当前号码 ： ' + msg + '\n'
-    yujing_flag = gambler_data.yujing_flag
-    print SN, SN_new
-    if SN != SN_new:
-        SN = SN_new
+    if global_data.SN != SN_new:
+        global_data.SN = SN_new
         #print s
-        if yujing_flag == 0:
+        if global_data.yujing_flag == 0:
             return
         else:
-            yujing_flag = 0
+            global_data.yujing_flag = 0
         if gl is not None:
             for group in gl:
-                s = gambler_data.s
-                for s_line in s:
+                for s_line in global_data.s:
                     s_all = s_all + s_line + '\n'
-		gambler_data.s = []
+		global_data.s = []
 		bot.SendTo(group, s_all)
                 s_all = ''
     '''

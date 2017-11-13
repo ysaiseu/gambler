@@ -144,6 +144,7 @@ class win_list:
 
         s.append("\n--------------------------------------------")
         '''
+        global_data.s = s
         return fail
       else:
         return 0
@@ -274,13 +275,11 @@ def query(*command):
             s.append("期数不能为零")  
         else:
             s.append("无对应模式")
-        finally:
-            global_data.s = s
+    global_data.s = s
 
 def data_handle(run):
     print "New Message coming!"     #flag to see if the robot is down
     mode_dict = global_data.mode_dict
-    s = global_data.s
     result = ['', '']
     if global_data.system_type == 1:
         ROOT = '/home/ubuntu/.qqbot-tmp/plugins/'
@@ -425,10 +424,10 @@ def data_handle(run):
         win_first_hot2.append(i,win(first,a,b))
         win_first_hot3.append(i,win(first,a,b,c))
         ##更新号码
-        cold_dict = cold(24,i)
+        global_data.cold_dict = cold(24,i)
         
         cold_list=[]
-        for i in sorted(cold_dict.items(), key=lambda d:d[1],reverse=False):
+        for i in sorted(global_data.cold_dict.items(), key=lambda d:d[1],reverse=False):
           cold_list.append(i[0])
 
         one = lottery_num[0]
@@ -438,10 +437,9 @@ def data_handle(run):
         five = lottery_num[4]
         #print one,two,three,four,five
 
-    global_data.cold_dict = cold_dict
     ##监控部分
     if run == 0:
-        s = []
+        global_data.s = []
         monitor_list = []
         for key,value in dict_item.items():
                 monitor_str = value['monitor'].split(',')
@@ -455,12 +453,11 @@ def data_handle(run):
             yujing_flag = 0
             print "当前无预警"
     elif run == 1:
-        s = []
-        query(command[0],command[1])
-    for i in s:
+        global_data.s = []
+        query(global_data.command[0],global_data.command[1])
+    for i in global_data.s:
         print i
         
-
     return result
 
 if __name__ == '__main__':

@@ -5,6 +5,7 @@ import re
 import urllib2
 from tabulate import tabulate
 import gambler_data
+import global_data
 
 def onQQMessage(bot, contact, member, content):
     if content == '状态':
@@ -13,10 +14,10 @@ def onQQMessage(bot, contact, member, content):
         bot.SendTo(contact, '已关闭')
         bot.Stop()
     elif re.match('查询.*(，.*)*',content):
-        gambler_data.command = content.replace('查询','',1).split('，')
+        global_data.command = content.replace('查询','',1).split('，')
         gambler_data.data_handle(1)
-        gambler_data.command = []
+        global_data.command = []
         text = ''
-        for i in gambler_data.s:
+        for i in global_data.s:
           text = text + i +'\n'
         bot.SendTo(contact,text)
