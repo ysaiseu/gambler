@@ -61,4 +61,4 @@ def init():
     result = gambler_data.data_handle(0)
     return result
     
-init()
+#init()
