@@ -451,7 +451,7 @@ def data_handle(run):
             global_data.yujing_flag = 1
             print "预警成功"
         else:
-            yujing_flag = 0
+            global_data.yujing_flag = 0
             print "当前无预警"
     elif run == 1:
         global_data.s = []
