@@ -14,14 +14,11 @@ from datetime import datetime, timedelta
 import threading
 import json
 import gambler_data
-
-lottery={}
-mode_dict = {}
-SN = 0
+import global_data
 
 @qqbotsched(hour='0-23/1', minute='0-59/1', second='0-59/10')
 def mytask(bot):
-    global SN
+    SN = global_data
    
     gl = bot.List('group', '测试群')
     man = bot.List('buddy', '开奔驰捡垃圾')
@@ -61,4 +58,4 @@ def init():
     result = gambler_data.data_handle(0)
     return result
     
-#init()
+init()

@@ -4,23 +4,8 @@
 import time
 from datetime import datetime, timedelta
 import json
+import global_data
 
-cold_dict = {}
-lottery={}
-mode_dict = {}
-s = []
-yujing_flag = 0
-command = [0,20]
-name_dict = {1:'win_back_one',2:'win_back_two',3:'win_back_thr',4:'win_back_double1',
-  5:'win_back_double2',6:'win_back_double3',7:'win_back_triple',11:'win_mid_one',
-  12:'win_mid_two',13:'win_mid_thr',14:'win_mid_double1',15:'win_mid_double2',
-  16:'win_mid_double3',17:'win_mid_triple',21:'win_first_one',22:'win_first_two',
-  23:'win_first_thr',24:'win_first_double1',25:'win_first_double2',26:'win_first_double3',27:'win_first_triple',
-  120:'win_5x_120',60:'win_5x_60',30:'win_5x_30',20:'win_5x_20',10:'win_5x_10',500:'win_5x_500',
-  0:'win_back_zusan',8:'win_mid_zusan',9:'win_first_zusan',
-  31:'win_back_cold1',32:'win_back_cold2',33:'win_back_cold3',34:'win_back_hot1',35:'win_back_hot2',36:'win_back_hot3',
-  41:'win_mid_cold1',42:'win_mid_cold2',43:'win_mid_cold3',44:'win_mid_hot1',45:'win_mid_hot2',46:'win_mid_hot3',
-  51:'win_first_cold1',52:'win_first_cold2',53:'win_first_cold3',54:'win_first_hot1',55:'win_first_hot2',56:'win_first_hot3'}
 def tongji(list,n):
   print "重复序列:"
   for i in list:
@@ -42,6 +27,7 @@ def if_yujing(list):
   return 0
 
 def cold(ran,issue):
+  lottery = global_data.lottery
   key_list = lottery.keys()
   key_list.sort()
   key_list_re = sorted(key_list,reverse=True)
@@ -61,7 +47,6 @@ def cold(ran,issue):
   return count_dict
 
 def count_5x(list):
-  #global dict_5x
   dict_5x = []
   count_list = [0,0,0,0]
   for i in range(10):
@@ -98,9 +83,9 @@ class win_list:
   def append(self,issue,if_win):
     self.win[issue]=if_win
   def monitor(self,threshold,pro,times):                   ##监控函数封装于字典类中，所有预警打印直接在此函数中进行，需针对该函数打印部分转化为机器人
-    global lottery
-    global mode_dict
-    global s
+    lottery = global_data.lottery
+    mode_dict = global_data.mode_dict
+    s = global_data.s
     key_list = lottery.keys()
     key_list_re = sorted(key_list,reverse=True)  ##倒序期数键值
     key_list.sort()
@@ -163,10 +148,10 @@ class win_list:
       else:
         return 0
 
-  def display(self,times):
-    global lottery
-    global mode_dict
-    global s
+def display(self,times):
+    lottery = global_data.lottery
+    mode_dict = global_data.mode_dict
+    s = global_data.s
     key_list = lottery.keys()
     key_list_re = sorted(key_list,reverse=True)  ##倒序期数键值
     key_list.sort()
@@ -214,6 +199,7 @@ class win_list:
                 yes = yes+1
         s[-1] = s[-1] + str(yes/times)[0:4] + ' '
     s.append("--------------------------------------------")
+    global_data.s = s
 
 
 
@@ -265,16 +251,16 @@ def choose_c(a,b,c,d,e):
     return (int(b)+1)%10
 
 def query(*command):
-    global lottery
-    global cold_dict
-    global s
+    lottery = global_data.lottery
+    mode_dict = global_data.mode_dict
+    s = global_data.s
     key_list = lottery.keys()
     key_list.sort()
     if command[0] == '冷号':
         cold_list = cold(command[1],key_list[-1])
         s.append(command[1]+'期冷号：')
         s.append('')
-        for i in sorted(cold_dict.items(), key=lambda d:d[1],reverse=False):
+        for i in sorted(global_data.cold_dict.items(), key=lambda d:d[1],reverse=False):
             s[-1] = s[-1] + str(i[0]) + ':' + str(i[1]) + '次，'
     else:
         try:
@@ -288,15 +274,18 @@ def query(*command):
             s.append("期数不能为零")  
         else:
             s.append("无对应模式")
+        finally:
+            global_data.s = s
 
 def data_handle(run):
     print "New Message coming!"     #flag to see if the robot is down
-    global lottery
-    global mode_dict
-    global s
+    mode_dict = global_data.mode_dict
+    s = global_data.s
     result = ['', '']
-    ROOT = '/home/ubuntu/.qqbot-tmp/plugins/'
-    ##ROOT = 'd:/users/xinhu/documents/github/gambler/'
+    if global_data.system_type == 1:
+        ROOT = '/home/ubuntu/.qqbot-tmp/plugins/'
+    else:
+        ROOT = 'd:/users/xinhu/documents/github/gambler/'
     ROOT_DATA = ROOT + 'data/'
     ROOT_CONFIG = ROOT + 'config/'
     now = datetime.now() + timedelta(hours=8)
@@ -318,9 +307,10 @@ def data_handle(run):
         line_s = line.split()
         issue = line_s[1]
         lottery_num = line_s[0]
-        lottery[issue] = lottery_num
+        global_data.lottery[issue] = lottery_num
         line = lottery_text.readline()
 
+    lottery = global_data.lottery
     key_list = lottery.keys()
     key_list.sort()
 
@@ -340,7 +330,7 @@ def data_handle(run):
     #init for such like win_back_two = win_list(2)
     for key,value in dict_item.items():
         globals()[key] = win_list((int)(value['init']))
-    global cold_dict
+
     cold_list = [0,1,2,3,4,5,6,7,8,9]
 
     one = two = three = four = five = -1
@@ -448,6 +438,7 @@ def data_handle(run):
         five = lottery_num[4]
         #print one,two,three,four,five
 
+    global_data.cold_dict = cold_dict
     ##监控部分
     if run == 0:
         s = []
@@ -457,9 +448,8 @@ def data_handle(run):
                 if monitor_str[0] != '-1':
                     monitor_list.append(globals()[key].monitor((float)(monitor_str[0]),(float)(monitor_str[1]),(int)(monitor_str[2])))
         
-        global yujing_flag
         if if_yujing(monitor_list):
-            yujing_flag = 1
+            global_data.yujing_flag = 1
             print "预警成功"
         else:
             yujing_flag = 0
