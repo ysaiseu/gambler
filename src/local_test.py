@@ -14,7 +14,8 @@ import socket
 import global_data
 import gambler_data
 
-exit = 1
+Init_finish = -1
+run_flag = 1
 
 def reboot():
     res = subprocess.Popen('ps -ef | grep qq', stdout=subprocess.PIPE,shell=True)
@@ -110,20 +111,28 @@ class InputThread(threading.Thread):
         threading.Thread.__init__(self, name = "InputThread") 
         self.result = ''
     def run(self):
+        global Init_finish
+        if Init_finish == -1:
+            print "等待初始化。。。。"
         while 1:
-            self.result = raw_input() 
-            if self.result == 'q' or self.result == 'Q':
-                global exit
-                exit = 0
-                return self.result
-            if re.match('查询.*(，.*)*', self.result):
-                global_data.command = self.result.replace('查询','',1).split('，')
+            if Init_finish == -1:
+                raw_input()
+                print "等待初始化。。。。"
+                continue
+            elif Init_finish == 1:
+                print "输入q/Q退出，可以输入其他命令"
+                Init_finish = 2
+            content = raw_input() 
+            if content == 'q' or content == 'Q':
+                print "正在退出。。。。"
+                global run_flag
+                run_flag = 0
+                break
+            if re.match('查询.*(，.*)*', content):
+                global_data.command = content.replace('查询','',1).split('，')
                 gambler_data.data_handle(1)
-                global_data.command = []
-                text = ''
-                for i in global_data.s:
-                    text = text + i +'\n'
-                return self.result
+                global_data.command = [0, 20]
+                break
             print "命令格式有误"
 
     def get_result(self):
@@ -142,7 +151,7 @@ if __name__ == "__main__":
                         filename='../log/logger.log',
                         filemode='w+')
 
-    while exit:
+    while run_flag:
         now = datetime.now() + timedelta(hours=8)
         yesterday = now - timedelta(days=1)
         date = now.strftime("%Y%m%d")
@@ -158,21 +167,15 @@ if __name__ == "__main__":
         t2 = ShowThread()
         t3 = InputThread()
         t1.start()  
-        t2.start()
         t3.start()
         t1.join()
-        t2.join()
         result1 = t1.get_result()
-        result2 = t2.get_result()
-        SN_new = result2[0]
-        if SN_new != global_data.SN:
-            for info in global_data.s:
-                print info
-            logging.info(global_data.s)
-
         if result1:
             logging.info('get info success')
-
+            Init_finish = 1 if Init_finish == -1 else 0
+        else:
+            time.sleep(5)
+            continue
         if yesterday_init == 0: 
             time.sleep(10)
             t1 = CrawThread(yesterdate)  
@@ -195,5 +198,20 @@ if __name__ == "__main__":
             f.write(r[1]+'\n')
         f.close()
 
+        t2.start()
+        t2.join()
+        if run_flag == 0:
+            break
+        result2 = t2.get_result()
+        SN_new = result2[0]
+        if SN_new != global_data.SN:
+            global_data.SN = SN_new
+            s_all = '上一期期号 ： ' + str(global_data.SN) + '\n'
+            s_all = s_all + '当前期号 ： ' + str(SN_new) + '\n'
+            s_all = s_all + '当前号码 ： ' + result2[1] + '\n'
+            print s_all
+            for info in global_data.s:
+                print info
+            logging.info(global_data.s)
+
         t3.join(10)
-        #time.sleep(10)
