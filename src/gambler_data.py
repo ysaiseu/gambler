@@ -105,12 +105,6 @@ class win_list:
       if self.win[i] == 0:
         fail = fail + 1
       elif fail >= threshold or yes < pro:   ##大于阈值 产生预警  以下为主要需要处理的部分
-        print "---------------------------------------------"
-        print mode_dict[self.mode],"已达到预警条件:"
-        print "当前次数:",fail
-        print "当前",times,"次成功率：",yes
-        print "近期走势:"
-        ##s = []
         s.append( "---------------------------------------------")
         s.append(mode_dict[self.mode]+" 已达到预警条件:")
         s.append("当前次数: "+str(fail))
@@ -126,10 +120,8 @@ class win_list:
           if self.win[j] == 0:
             count = count + 1
           else:
-            print count,
             s[-1] = s[-1] + str(count) +' '
             count = 0
-        print "\n--------------------------------------------"
         '''
         s.append('')
         if len(key_list) < times:
@@ -279,13 +271,14 @@ def query(*command):
     global_data.s = s
 
 def data_handle(run):
-    print "New Message coming!"     #flag to see if the robot is down
     mode_dict = global_data.mode_dict
     result = ['', '']
     if global_data.system_type == 1:
         ROOT = '/home/ubuntu/.qqbot-tmp/plugins/'
+    #else:
+    #    ROOT = 'd:/users/xinhu/documents/github/gambler/'
     else:
-        ROOT = 'd:/users/xinhu/documents/github/gambler/'
+        ROOT = '../'
     ROOT_DATA = ROOT + 'data/'
     ROOT_CONFIG = ROOT + 'config/'
     now = datetime.now() + timedelta(hours=8)
@@ -294,7 +287,6 @@ def data_handle(run):
     lottery_text = open(ROOT_DATA+date+'.txt',"r+")
     ##lottery_text = open('number.txt',"r+")
     line = lottery_text.readline()
-    #print line
 
     with open(ROOT_CONFIG+"config1.json") as config_f:
         config_dict = json.load(config_f)
@@ -436,7 +428,6 @@ def data_handle(run):
         three = lottery_num[2]
         four = lottery_num[3]
         five = lottery_num[4]
-        #print one,two,three,four,five
 
     ##监控部分
     if run == 0:
@@ -449,15 +440,13 @@ def data_handle(run):
         
         if if_yujing(monitor_list):
             global_data.yujing_flag = 1
-            print "预警成功"
         else:
             global_data.yujing_flag = 0
-            print "当前无预警"
     elif run == 1:
         global_data.s = []
         query(global_data.command[0],global_data.command[1])
-    for i in global_data.s:
-        print i
+        for i in global_data.s:
+            print i
         
     return result
 

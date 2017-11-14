@@ -15,6 +15,7 @@ import threading
 import json
 import gambler_data
 import global_data
+import logging
 
 @qqbotsched(hour='0-23/1', minute='0-59/1', second='0-59/10')
 def mytask(bot):
@@ -51,7 +52,14 @@ def mytask(bot):
     '''
 
 def init():
+    print "New Message coming!"     #flag to see if the robot is down
     result = gambler_data.data_handle(0)
     return result
-    
+ 
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
+                    datefmt='%a, %d %b %Y %H:%M:%S',
+                    filename='../log/logger_msg.log',
+                    filemode='w+')
+   
 init()
