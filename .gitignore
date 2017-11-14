@@ -1,0 +1,6 @@
+data/*.txt
+src/*.txt
+*.log
+*.out
+*.pyc
+
